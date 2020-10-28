@@ -73,6 +73,54 @@ class _SpeechScreenState extends State<SpeechScreen> {
   String _text = "Press the button and start speaking.";
   double _confidence = 1.0;
 
+  @override
+  void initState() {
+    super.initState();
+    _speech = stt.SpeechToText();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 80.0,
+        elevation: 10.0,
+        title: Text("Confidence: ${(_confidence * 100).toStringAsFixed(1)}"),
+        centerTitle: true,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: AvatarGlow(
+        animate: _isListening,
+        glowColor: Theme.of(context).primaryColor,
+        endRadius: 75.0,
+        duration: Duration(milliseconds: 2000),
+        repeatPauseDuration: Duration(milliseconds: 100),
+        repeat: true,
+        //
+        //
+        child: FloatingActionButton(
+          onPressed: _listen,
+          child: Icon(_isListening ? Icons.mic : Icons.mic_none),
+        ),
+      ),
+      body: SingleChildScrollView(
+        reverse: true,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0),
+          child: TextHighlight(
+            text: _text,
+            words: _highlights,
+            textStyle: TextStyle(
+              fontSize: 32.0,
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _listen() async {
     if (!_isListening) {
       bool available = await _speech.initialize(
@@ -98,44 +146,5 @@ class _SpeechScreenState extends State<SpeechScreen> {
         _speech.stop();
       }
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Confidence: ${(_confidence * 100).toStringAsFixed(1)}"),
-        centerTitle: true,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: AvatarGlow(
-        animate: _isListening,
-        glowColor: Theme.of(context).primaryColor,
-        endRadius: 75.0,
-        duration: Duration(milliseconds: 2000),
-        repeatPauseDuration: Duration(milliseconds: 100),
-        repeat: true,
-        //
-        //
-        child: FloatingActionButton(
-          onPressed: _listen,
-          child: Icon(_isListening ? Icons.mic : Icons.mic_none),
-        ),
-      ),
-      body: SingleChildScrollView(
-        reverse: true,
-        child: Container(
-          child: TextHighlight(
-            text: _text,
-            words: _highlights,
-            textStyle: TextStyle(
-              fontSize: 32.0,
-              color: Colors.black,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
